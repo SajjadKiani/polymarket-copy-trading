@@ -55,7 +55,7 @@ export class AccountTracker {
    */
   async syncAllAccounts() {
     const accounts = await this.db.getTrackedAccounts();
-    
+
     console.log(`\n🔄 Syncing ${accounts.length} accounts...`);
 
     for (const account of accounts) {
@@ -121,7 +121,7 @@ export class AccountTracker {
         // Check if trade already exists
         const existingTrades = await this.db.getTrades({
           accountId,
-          tokenId: trade.asset_id,
+          tokenId: trade.asset,
         });
 
         const exists = existingTrades.some(
@@ -132,9 +132,9 @@ export class AccountTracker {
 
         // Get market info if available
         let marketInfo: any = null;
-        if (trade.market) {
+        if (trade.conditionId) {
           try {
-            marketInfo = await this.api.gamma.getMarket(trade.market);
+            marketInfo = await this.api.gamma.getMarket(trade.conditionId);
           } catch (error) {
             // Market info not critical
           }
@@ -144,19 +144,19 @@ export class AccountTracker {
         const openPositions = await this.db.client.position.findMany({
           where: {
             accountId,
-            tokenId: trade.asset_id,
+            tokenId: trade.asset,
             status: 'OPEN',
           },
         });
 
-        const price = parseFloat(trade.price);
-        const size = parseFloat(trade.size);
+        const price = typeof trade.price === 'string' ? parseFloat(trade.price) : trade.price;
+        const size = typeof trade.size === 'string' ? parseFloat(trade.size) : trade.size;
 
         if (openPositions.length === 0 && trade.side === 'BUY') {
           // New position
           await this.simulator.openPosition({
             accountId,
-            tokenId: trade.asset_id,
+            tokenId: trade.asset,
             side: trade.side,
             outcome: 'YES', // Infer from context
             price,
@@ -190,8 +190,8 @@ export class AccountTracker {
               await this.db.createTrade({
                 accountId,
                 positionId: position.id,
-                tokenId: trade.asset_id,
-                marketId: trade.market,
+                tokenId: trade.asset,
+                marketId: trade.conditionId,
                 side: trade.side,
                 outcome: position.outcome,
                 price,
@@ -217,8 +217,8 @@ export class AccountTracker {
             await this.db.createTrade({
               accountId,
               positionId: position.id,
-              tokenId: trade.asset_id,
-              marketId: trade.market,
+              tokenId: trade.asset,
+              marketId: trade.conditionId,
               side: trade.side,
               outcome: position.outcome,
               price,

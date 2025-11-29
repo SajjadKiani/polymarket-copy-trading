@@ -71,7 +71,20 @@ export class DatabaseService {
     currentPrice: number;
     quantity: number;
   }) {
-    return this.prisma.position.create({ data });
+    return this.prisma.position.create({
+      data: {
+        accountId: data.accountId,
+        tokenId: data.tokenId,
+        marketId: data.marketId,
+        marketSlug: data.marketSlug,
+        marketQuestion: data.marketQuestion,
+        side: data.side,
+        outcome: data.outcome,
+        entryPrice: data.entryPrice,
+        currentPrice: data.currentPrice,
+        quantity: data.quantity,
+      }
+    });
   }
 
   async updatePosition(

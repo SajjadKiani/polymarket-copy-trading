@@ -43,7 +43,7 @@ Create a `.env` file in the root directory:
 ```env
 # API Endpoints (optional, defaults provided)
 CLOB_API_URL=https://clob.polymarket.com
-GAMMA_API_URL=https://gamma.polymarket.com
+GAMMA_API_URL=https://gamma-api.polymarket.com
 DATA_API_URL=https://data-api.polymarket.com
 
 # Database
@@ -54,7 +54,7 @@ POLL_INTERVAL_MS=60000
 MAX_HISTORICAL_DAYS=30
 
 # Tracked Accounts (comma-separated wallet addresses)
-TRACKED_ACCOUNTS=0x1234...,0x5678...
+TRACKED_ACCOUNTS=0xeee92f1cc6d6e0ad0b4ffda20b01cf3678e27ecb
 ```
 
 ## 🏗️ Project Structure

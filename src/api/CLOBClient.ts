@@ -67,10 +67,10 @@ export class CLOBClient {
   }
 
   /**
-   * Get CLOB server status
+   * Get CLOB server status (using time endpoint)
    */
   async getStatus(): Promise<any> {
-    const response = await this.client.get(`/status`);
+    const response = await this.client.get(`/time`);
     return response.data;
   }
 }

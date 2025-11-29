@@ -18,25 +18,28 @@ export interface Market {
 }
 
 export interface Trade {
-  id: string;
-  market: string;
-  asset_id: string;
-  maker_address: string;
+  id?: string; // Not always present in new API
+  conditionId?: string; // Was market
+  asset: string; // Was asset_id
+  maker_address?: string;
   taker_address?: string;
   side: 'BUY' | 'SELL';
-  size: string;
-  price: string;
-  status: string;
+  size: string | number; // API returns number, but keeping flexibility
+  price: string | number; // API returns number
+  status?: string;
   timestamp: number;
-  transaction_hash?: string;
+  transactionHash?: string; // Was transaction_hash
   bucket_index?: number;
 }
 
 export interface Position {
-  asset_id: string;
-  market_id?: string;
-  side: 'BUY' | 'SELL';
-  size: string;
+  asset: string; // Was asset_id
+  conditionId?: string; // Was market_id
+  side?: 'BUY' | 'SELL';
+  outcome?: string;
+  size: string | number; // API returns number
+  avgPrice?: number;
+  curPrice?: number;
   value?: string;
 }
 

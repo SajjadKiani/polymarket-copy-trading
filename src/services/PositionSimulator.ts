@@ -146,14 +146,14 @@ export class PositionSimulator {
   async reconcilePositions(accountAddress: string, accountId: string) {
     // Get current positions from API
     const apiPositions = await this.api.data.getPositions(accountAddress);
-    
+
     // Get our tracked positions
     const dbPositions = await this.db.getOpenPositions(accountId);
 
     // Create a map of API positions by tokenId
     const apiPositionMap = new Map<string, ApiPosition>();
     for (const pos of apiPositions) {
-      apiPositionMap.set(pos.asset_id, pos);
+      apiPositionMap.set(pos.asset, pos);
     }
 
     // Update or close existing positions
@@ -166,7 +166,7 @@ export class PositionSimulator {
         await this.closePosition(dbPos.id, currentPrice);
       } else {
         // Update quantity if changed
-        const apiSize = parseFloat(apiPos.size);
+        const apiSize = typeof apiPos.size === 'string' ? parseFloat(apiPos.size) : apiPos.size;
         if (Math.abs(apiSize - dbPos.quantity) > 0.001) {
           await this.db.updatePosition(dbPos.id, {
             quantity: apiSize,
@@ -178,19 +178,19 @@ export class PositionSimulator {
     // Check for new positions not in our DB
     for (const apiPos of apiPositions) {
       const existsInDb = dbPositions.some(
-        (dbPos) => dbPos.tokenId === apiPos.asset_id
+        (dbPos) => dbPos.tokenId === apiPos.asset
       );
 
       if (!existsInDb) {
         // New position found, add it
-        const price = await this.api.getCurrentPrice(apiPos.asset_id);
+        const price = await this.api.getCurrentPrice(apiPos.asset);
         await this.openPosition({
           accountId,
-          tokenId: apiPos.asset_id,
-          side: apiPos.side,
+          tokenId: apiPos.asset,
+          side: apiPos.side || 'BUY', // Default to BUY if side not provided
           outcome: 'YES', // Infer from side if possible
           price,
-          quantity: parseFloat(apiPos.size),
+          quantity: typeof apiPos.size === 'string' ? parseFloat(apiPos.size) : apiPos.size,
         });
       }
     }
@@ -203,7 +203,7 @@ export class PositionSimulator {
    */
   async updateAllPositionPrices() {
     const openPositions = await this.db.getOpenPositions();
-    
+
     console.log(`🔄 Updating ${openPositions.length} open positions...`);
 
     for (const position of openPositions) {
