@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model TrackedAccount {
+  id            String     @id @default(uuid())
+  address       String     @unique
+  nickname      String?
+  isActive      Boolean    @default(true)
+  totalPnL      Float      @default(0)
+  winRate       Float      @default(0)
+  totalTrades   Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  positions     Position[]
+  trades        Trade[]
+
+  @@index([address])
+}
+
+model Position {
+  id              String         @id @default(uuid())
+  accountId       String
+  account         TrackedAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  tokenId         String
+  marketId        String?
+  marketSlug      String?
+  marketQuestion  String?
+  
+  side            String         // "BUY" or "SELL"
+  outcome         String         // "YES" or "NO"
+  
+  entryPrice      Float
+  currentPrice    Float
+  quantity        Float
+  
+  realizedPnL     Float          @default(0)
+  unrealizedPnL   Float          @default(0)
+  totalPnL        Float          @default(0)
+  
+  status          String         @default("OPEN") // OPEN, CLOSED, EXPIRED
+  
+  openedAt        DateTime       @default(now())
+  closedAt        DateTime?
+  lastUpdated     DateTime       @updatedAt
+  
+  trades          Trade[]
+
+  @@index([accountId])
+  @@index([tokenId])
+  @@index([status])
+}
+
+model Trade {
+  id              String         @id @default(uuid())
+  accountId       String
+  account         TrackedAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  positionId      String?
+  position        Position?      @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  
+  tokenId         String
+  marketId        String?
+  
+  side            String         // "BUY" or "SELL"
+  outcome         String         // "YES" or "NO"
+  
+  price           Float
+  size            Float
+  value           Float          // price * size
+  
+  tradeType       String         // "OPEN", "CLOSE", "ADD", "REDUCE"
+  
+  transactionHash String?
+  blockNumber     Int?
+  
+  timestamp       DateTime       @default(now())
+  createdAt       DateTime       @default(now())
+
+  @@index([accountId])
+  @@index([positionId])
+  @@index([tokenId])
+  @@index([timestamp])
+}
+
+model Market {
+  id              String    @id
+  conditionId     String    @unique
+  questionId      String
+  question        String
+  description     String?
+  
+  endDate         DateTime?
+  resolutionDate  DateTime?
+  
+  yesTokenId      String
+  noTokenId       String
+  
+  volume          Float     @default(0)
+  liquidity       Float     @default(0)
+  
+  resolved        Boolean   @default(false)
+  winner          String?   // "YES", "NO", or null
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([conditionId])
+  @@index([yesTokenId])
+  @@index([noTokenId])
+}
+
+model SyncState {
+  id              String    @id @default(uuid())
+  accountAddress  String    @unique
+  lastSyncedBlock Int       @default(0)
+  lastSyncedTime  DateTime  @default(now())
+  
+  @@index([accountAddress])
+}
