@@ -66,7 +66,7 @@ export class PolymarketAPI {
     try {
       return await this.clob.getMidpoint(tokenId);
     } catch (error) {
-      console.error(`Error getting price for token ${tokenId}:`, error);
+      console.error(`Error getting price for token ${tokenId}:`);
       return 0;
     }
   }
@@ -100,7 +100,7 @@ export class PolymarketAPI {
     }
 
     try {
-      // Try to get any public data
+      await this.data.getPositions(config.TRACKED_ACCOUNTS[0])
       results.data = true;
     } catch (error) {
       console.error('Data API health check failed:', error);

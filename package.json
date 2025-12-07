@@ -4,12 +4,20 @@
   "description": "Copy trading bot for Polymarket",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "build": "bun build",
+    "start": "bun run dist/index.js",
+    "dev": "bun --watch src/index.ts",
+    "test:pnl": "bun tests/test-pnl-calculator.ts",
+    "test:database": "bun tests/test-database-service.ts",
+    "test:api": "bun tests/test-polymarket-api-simple.ts",
+    "test:position": "bun tests/test-position-simulator.ts",
+    "test:account": "bun tests/test-account-tracker.ts",
+    "test:all": "bun run test:pnl && bun run test:database && bun run test:position && bun run test:account",
+    "prisma:generate": "bunx prisma generate",
+    "prisma:migrate": "bunx prisma migrate dev",
+    "prisma:studio": "bunx prisma studio",
+    "prisma:reset": "bunx prisma migrate reset",
+    "setup": "bun install && bun run prisma:generate && bun run prisma:migrate"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
@@ -21,7 +29,7 @@
     "@types/node": "^24.10.1",
     "@types/ws": "^8.18.1",
     "prisma": "^6.19.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "bun-types": "latest"
   }
 }

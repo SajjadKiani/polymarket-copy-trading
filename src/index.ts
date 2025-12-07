@@ -56,12 +56,13 @@ class PolymarketCopyTradingBot {
     await this.initialize();
 
     // Start tracking
-    await this.tracker.startTracking(config.POLL_INTERVAL_MS);
-
+    // await this.tracker.startTracking(config.POLL_INTERVAL_MS);
+    await this.displayAccountDetails("e03dc722-478e-4b39-b67b-818a0632aa1d")
+    await this.displayLeaderboard()
     // Display leaderboard periodically
-    setInterval(async () => {
-      await this.displayLeaderboard();
-    }, 5 * 60 * 1000); // Every 5 minutes
+    // setInterval(async () => {
+    //   await this.displayLeaderboard();
+    // }, 5 * 60 * 1000); // Every 5 minutes
   }
 
   async displayLeaderboard() {

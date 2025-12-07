@@ -63,7 +63,7 @@ The CLOB API is the primary interface for trading and market making.
 ### 2.2. Gamma API (Market Data)
 The Gamma API provides comprehensive market and event metadata.
 
-*   **Base URL:** `https://gamma.polymarket.com`
+*   **Base URL:** `https://gamma-api.polymarket.com`
 *   **Functionality:** Fetching market details, event information, and user profiles.
 *   **Key Endpoints:**
     *   `/markets`: Get a list of markets, filterable by various parameters.

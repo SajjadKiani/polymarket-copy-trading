@@ -163,7 +163,8 @@ export class PositionSimulator {
       if (!apiPos) {
         // Position no longer exists in API, close it
         const currentPrice = await this.api.getCurrentPrice(dbPos.tokenId);
-        await this.closePosition(dbPos.id, currentPrice);
+        if (currentPrice)
+          await this.closePosition(dbPos.id, currentPrice);
       } else {
         // Update quantity if changed
         const apiSize = typeof apiPos.size === 'string' ? parseFloat(apiPos.size) : apiPos.size;
@@ -184,14 +185,15 @@ export class PositionSimulator {
       if (!existsInDb) {
         // New position found, add it
         const price = await this.api.getCurrentPrice(apiPos.asset);
-        await this.openPosition({
-          accountId,
-          tokenId: apiPos.asset,
-          side: apiPos.side || 'BUY', // Default to BUY if side not provided
-          outcome: 'YES', // Infer from side if possible
-          price,
-          quantity: typeof apiPos.size === 'string' ? parseFloat(apiPos.size) : apiPos.size,
-        });
+        if (price)
+          await this.openPosition({
+            accountId,
+            tokenId: apiPos.asset,
+            side: apiPos.side || 'BUY', // Default to BUY if side not provided
+            outcome: 'YES', // Infer from side if possible
+            price,
+            quantity: typeof apiPos.size === 'string' ? parseFloat(apiPos.size) : apiPos.size,
+          });
       }
     }
 
@@ -209,7 +211,8 @@ export class PositionSimulator {
     for (const position of openPositions) {
       try {
         const currentPrice = await this.api.getCurrentPrice(position.tokenId);
-        await this.updatePositionPrice(position.id, currentPrice);
+        if (currentPrice)
+          await this.updatePositionPrice(position.id, currentPrice);
       } catch (error) {
         console.error(
           `Error updating position ${position.id}:`,
